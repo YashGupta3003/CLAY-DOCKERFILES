@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  claymodel-jupyter:
+    build: .
+    container_name: claymodel-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      # Mount the current directory to /workspace/claymodel
+      - .:/workspace/claymodel
+      # Mount a data directory for datasets
+      - ./data:/workspace/data
+      # Mount a cache directory for downloaded models
+      - ./cache:/workspace/cache
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+    networks:
+      - claymodel-network
+
+networks:
+  claymodel-network:
+    driver: bridge
